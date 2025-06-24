@@ -7,7 +7,6 @@ RESP = requests.get(URL, timeout=15)
 
 soup = BeautifulSoup(RESP.content, "html.parser")
 
-# etiquetas dos separadores (datas: «24 Jun», «25 Jun», …)
 tabs = [a.get_text(strip=True).split(",")[0]
         for a in soup.select("ul.simpleTabsNavigation li a")]
 
@@ -16,7 +15,6 @@ leitura_18h = [] # (dia, temp)
 for idx, table in enumerate(soup.select("div.simpleTabsContent table.tablelist")):
     dia = tabs[idx] if idx < len(tabs) else f"Dia {idx}"
 
-    # procura apenas a linha das 18 h
     linha_18h = next(
         (tr for tr in table.select("tr")[1:]            # ignora cabeçalho
          if tr.td and tr.td.get_text(strip=True) == "18h"),
@@ -34,16 +32,13 @@ for idx, table in enumerate(soup.select("div.simpleTabsContent table.tablelist")
 
     leitura_18h.append((dia, temp))
 
-# ────────────────────────────────
-# Enviar (ou só mostrar) resultado
-# ────────────────────────────────
+
 if leitura_18h:
     linhas = [f"▸ {dia}: {t:.1f} °C às 18 h" for dia, t in leitura_18h]
     mensagem = "🌊 Temperatura da água na Fonte da Telha\n" + "\n".join(linhas)
 
     print(mensagem)
 
-    # Se ainda quiseres alertar só quando > 19 °C:
     if any(t > 19 for _, t in leitura_18h):
         load_dotenv()
         BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
