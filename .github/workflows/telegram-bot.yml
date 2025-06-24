@@ -2,7 +2,7 @@ name: Telegram Water Temperature Bot
 
 on:
   schedule:
-    - cron: "* * * * *"
+    - cron: "*/6 * * * *"
   workflow_dispatch:
 
 jobs:
